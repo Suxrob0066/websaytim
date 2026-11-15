@@ -49,7 +49,11 @@ async function handleSend(request, env) {
     body: JSON.stringify({ chat_id: env.CHAT_ID, text, parse_mode: "HTML" }),
   });
 
-  if (!tg.ok) return json({ ok: false, error: "telegram" }, 502);
+  if (!tg.ok) {
+    let desc = "";
+    try { desc = (await tg.json()).description || ""; } catch {}
+    return json({ ok: false, error: "telegram", detail: desc.slice(0, 200) }, 502);
+  }
   return json({ ok: true });
 }
 
